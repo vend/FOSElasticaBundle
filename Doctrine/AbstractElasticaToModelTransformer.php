@@ -2,6 +2,7 @@
 
 namespace FOS\ElasticaBundle\Doctrine;
 
+use FOS\ElasticaBundle\Exception\MissingObjectsException;
 use FOS\ElasticaBundle\HybridResult;
 use FOS\ElasticaBundle\Transformer\ElasticaToModelTransformerInterface;
 use FOS\ElasticaBundle\Transformer\HighlightableModelInterface;
@@ -84,7 +85,7 @@ abstract class AbstractElasticaToModelTransformer implements ElasticaToModelTran
      * model objects fetched from the doctrine repository
      *
      * @param array $elasticaObjects of elastica objects
-     * @throws \RuntimeException
+     * @throws MissingObjectsException
      * @return array
      **/
     public function transform(array $elasticaObjects)
@@ -97,7 +98,7 @@ abstract class AbstractElasticaToModelTransformer implements ElasticaToModelTran
 
         $objects = $this->findByIdentifiers($ids, $this->options['hydrate']);
         if (!$this->options['ignore_missing'] && count($objects) < count($elasticaObjects)) {
-            throw new \RuntimeException('Cannot find corresponding Doctrine objects for all Elastica results.');
+            throw new MissingObjectsException('Cannot find corresponding Doctrine objects for all Elastica results.', $ids);
         };
 
         foreach ($objects as $object) {
